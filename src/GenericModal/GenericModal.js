@@ -6,14 +6,17 @@ GenericModal.propTypes = {
   showModalStatus: PropTypes.bool,
   onModalOpen: PropTypes.func,
   onModalClose: PropTypes.func,
+  buttonText: PropTypes.string,
   modalWidth: PropTypes.string,
 }
 GenericModal.defaultProps = {
   showModalStatus: false,
+  buttonText:"Cancel",
   modalWidth: "350px",
   onModalOpen: function() {
    
   },
+
 }
 
 function GenericModal({
@@ -21,6 +24,7 @@ function GenericModal({
   onModalClose,
   onModalOpen,
   modalWidth,
+  buttonText,
   children,
 }) {
   const onMaskClick = e => {
@@ -63,7 +67,7 @@ function GenericModal({
                 <ModalHeader>
                   <ModalDefaultButton />
                   <ModalHeaderCenterButton>
-                    <div onClick={onModalClose}>Cancel</div>
+                    <div onClick={onModalClose}>{buttonText}</div>
                   </ModalHeaderCenterButton>
 
                   <ModalDefaultButton />

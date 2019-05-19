@@ -13,3 +13,5 @@ onModalClose: function (this function is called when "Cancel" and "X" is clicked
 onModalOpen: function (this function is called when modal is opened, default is do nothing)
 
 modalWidth: string (this sets the width of the Modal, default is 350px. Example Format: "550px").
+
+buttonText: string (this is text in the button at the bottom of the modal, Default: "cancel")
