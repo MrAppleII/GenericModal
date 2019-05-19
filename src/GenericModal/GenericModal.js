@@ -16,6 +16,9 @@ GenericModal.defaultProps = {
   onModalOpen: function() {
    
   },
+  onModalClose: function(){
+
+  },
 
 }
 
