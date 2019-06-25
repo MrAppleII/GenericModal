@@ -1,4 +1,6 @@
-import React, { useEffect } from "react"
+import React, { useState, useEffect } from "react"
+import ReactDOM from "react-dom"
+
 import PropTypes from "prop-types"
 import styled, { keyframes } from "styled-components"
 
@@ -11,15 +13,10 @@ GenericModal.propTypes = {
 }
 GenericModal.defaultProps = {
   showModalStatus: false,
-  buttonText:"Cancel",
+  buttonText: "Cancel",
   modalWidth: "350px",
-  onModalOpen: function() {
-   
-  },
-  onModalClose: function(){
-
-  },
-
+  onModalOpen: function() {},
+  onModalClose: function() {},
 }
 
 function GenericModal({
@@ -34,55 +31,58 @@ function GenericModal({
     onModalClose()
   }
   try {
-    
-  useEffect(() => {
-    // Update the document title using the browser API
-    if (showModalStatus) {
-       
-            onModalOpen()
-       
-    }
-  })
+    useEffect(() => {
+      if (showModalStatus) {
+        onModalOpen()
+      }
+      const handleResize = () => {
+        console.log("listening...")
+        setDimensions({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        })
+      }
 
- 
+      window.addEventListener("resize", handleResize)
+      
+
+      return () => {
+       
+        window.removeEventListener("resize", handleResize)
+      }
+    }, [])
+
+    const [dimensions, setDimensions] = useState({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    })
+
     return showModalStatus ? (
-      <>
-        <FadeWrapper>
-          <ModelMask>
-            <ModalWrapper onClick={onMaskClick}>
-              <ModalContainer
-                onClick={e => {
-                  // We are simply preventing the e based function up above from misfiring
-                  e.stopPropagation()
-                }}
-                style={{ maxWidth: modalWidth }}
-              >
-                <ModalHeader>
-                  <ModalDefaultButton />
-
-                  <ModalHeaderCenterItem />
-
-                  <ModalDefaultButton onClick={onModalClose}>
-                    X
-                  </ModalDefaultButton>
-                </ModalHeader>
-                <ModalBody>{children}</ModalBody>
-                <ModalHeader>
-                  <ModalDefaultButton />
-                  <ModalHeaderCenterButton>
-                    <div onClick={onModalClose}>{buttonText}</div>
-                  </ModalHeaderCenterButton>
-
-                  <ModalDefaultButton />
-                </ModalHeader>
-              </ModalContainer>
-            </ModalWrapper>
-          </ModelMask>
-        </FadeWrapper>
-      </>
+      <>  <ModelMask
+          width={`${dimensions.width}` + `px`}
+          height={`${dimensions.height}` + `px`}
+        >
+          <ModalWrapper onClick={onMaskClick}>
+            <ModalContainer
+              onClick={e => {
+                // We are simply preventing the e based function up above from misfiring
+                e.stopPropagation()
+              }}
+              style={{ maxWidth: modalWidth }}
+            >
+              <ModalBody>{children}</ModalBody>
+            </ModalContainer>
+          </ModalWrapper>
+        </ModelMask>
+        </>
+      
     ) : null
-  } catch(e) {
+  } catch (e) {
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+      console.log(e,React.version)
+    }
     return (
+      
       <ModelMask>
         <ModalWrapper onClick={onMaskClick}>
           <ModalContainer
@@ -111,27 +111,28 @@ function GenericModal({
 }
 
 // Styling for the Modal Components **********
+const fadeInEffect = keyframes`
+from {
+  -webkit-transform: scale3d(1.3, 1.3, 1.3);
+  transform: scale3d(1.3, 1.3, 1.3);
+}
+`
 const ModelMask = styled.div`
   position: fixed;
-  z-index: 100;
+  z-index: 999 !important;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: ${props => props.width || "100vw"};
+  height: ${props => props.height || "100vh"};
   background-color: rgba(0, 0, 0, 0.5);
   display: table;
 `
-const fadeInEffect = keyframes`
-from {
-    opacity: 0;
-}
- 
 
-`
-const FadeWrapper = styled.div`
-  animation: ${fadeInEffect} both cubic-bezier(0.2, 0.8, 0.2, 1);
-  animation-duration: 0.3s;
-`
 /* This styling is for the corner buttons containing the content */
 
 const ModalDefaultButton = styled.a`
@@ -140,13 +141,17 @@ const ModalDefaultButton = styled.a`
   font-weight: normal !important;
 `
 const ModalWrapper = styled.div`
+  position: relative;
   display: table-cell;
   vertical-align: middle;
+  z-index: 999 !important;
 `
 /* This styling is for the actual border containing the content */
 const ModalContainer = styled.div`
-  z-index: 101;
   margin: 0px auto;
+  position: relative;
+  z-index: 999 !important;
+
   padding: 20px 30px;
   background-color: #fff;
   border-radius: 4px;
@@ -154,25 +159,37 @@ const ModalContainer = styled.div`
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif !important;
   transition: all 0.3s ease;
+  animation: ${fadeInEffect} forwards cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation-duration: 0.13s;
 `
 const ModalHeaderCenterItem = styled.div`
   flex-grow: 1;
   text-align: center;
+  position: relative;
+  z-index: 999 !important;
 `
 const ModalHeaderCenterButton = styled.div`
   flex-grow: 1;
   text-align: center;
+  position: relative;
+  z-index: 999 !important;
+
   cursor: pointer;
 `
 const ModalHeader = styled.h3`
   margin-top: 0;
   font-weight: bold;
   display: flex;
+  position: relative;
+  z-index: 999 !important;
+
   align-items: center;
   justify-content: center;
 `
 const ModalBody = styled.div`
   margin: 20px 0;
+  position: relative;
+  z-index: 999 !important;
 `
 
 export default GenericModal
