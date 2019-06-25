@@ -15,6 +15,15 @@ class GenericModal extends Component {
 
   }
 }
+handleResize = (e) =>{
+  this.setState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  })
+   
+
+
+}
 
 onMaskClick = e => {
   this.props.onModalClose()
@@ -32,7 +41,7 @@ componentWillUnmount() {
 
 render() {
   try {
-    return this.props.showModalStatus? (
+    return this.props.showModalStatus? ReactDOM.createPortal(
       <ModelMask
       width={`${this.state.width}` + `px`}
       height={`${this.state.height}` + `px`}
@@ -48,7 +57,7 @@ render() {
           <ModalBody>{this.props.children}</ModalBody>
         </ModalContainer>
       </ModalWrapper>
-    </ModelMask>
+    </ModelMask>, document.body
     ) : null
   } catch (e) {
     if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
