@@ -1,8 +1,90 @@
-import React, { useState, useEffect } from "react"
+import React, { Component } from "react"
 import ReactDOM from "react-dom"
 
 import PropTypes from "prop-types"
 import styled, { keyframes } from "styled-components"
+
+
+
+class GenericModal extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+
+  }
+}
+
+onMaskClick = e => {
+  this.props.onModalClose()
+}
+componentDidMount() {
+  window.addEventListener("resize", this.handleResize)
+
+
+}
+componentWillUnmount() {
+
+  window.removeEventListener("resize", this.handleResize)
+}
+
+
+render() {
+  try {
+    return this.props.showModalStatus? (
+      <ModelMask
+      width={`${this.state.width}` + `px`}
+      height={`${this.state.height}` + `px`}
+    >
+      <ModalWrapper onClick={this.onMaskClick}>
+        <ModalContainer
+          onClick={e => {
+            // We are simply preventing the e based function up above from misfiring
+            e.stopPropagation()
+          }}
+          style={{ maxWidth: this.props.modalWidth }}
+        >
+          <ModalBody>{this.props.children}</ModalBody>
+        </ModalContainer>
+      </ModalWrapper>
+    </ModelMask>
+    ) : null
+  } catch (e) {
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+      console.log(e)
+    }
+    return (
+      
+      <ModelMask>
+        <ModalWrapper onClick={this.onMaskClick}>
+          <ModalContainer
+            onClick={e => {
+              // We are simply preventing the e based function up above from misfiring
+              e.stopPropagation()
+            }}
+          >
+            <ModalHeader>
+              <ModalHeaderCenterItem>Oops</ModalHeaderCenterItem>
+            </ModalHeader>
+            <ModalBody>Something went wrong here.</ModalBody>
+            <ModalHeader>
+              <ModalDefaultButton />
+              <ModalHeaderCenterButton>
+                <div onClick={this.onModalClose}>Okay</div>
+              </ModalHeaderCenterButton>
+
+              <ModalDefaultButton />
+            </ModalHeader>
+          </ModalContainer>
+        </ModalWrapper>
+      </ModelMask>
+    )}
+}
+}
+
+
+export default GenericModal
 
 GenericModal.propTypes = {
   showModalStatus: PropTypes.bool,
@@ -19,96 +101,7 @@ GenericModal.defaultProps = {
   onModalClose: function() {},
 }
 
-function GenericModal({
-  showModalStatus,
-  onModalClose,
-  onModalOpen,
-  modalWidth,
-  buttonText,
-  children,
-}) {
-  const onMaskClick = e => {
-    onModalClose()
-  }
-  try {
-    useEffect(() => {
-      if (showModalStatus) {
-        onModalOpen()
-      }
-      const handleResize = () => {
-        console.log("listening...")
-        setDimensions({
-          width: window.innerWidth,
-          height: window.innerHeight,
-        })
-      }
-
-      window.addEventListener("resize", handleResize)
-      
-
-      return () => {
-       
-        window.removeEventListener("resize", handleResize)
-      }
-    }, [])
-
-    const [dimensions, setDimensions] = useState({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    })
-
-    return showModalStatus ? (
-      <>  <ModelMask
-          width={`${dimensions.width}` + `px`}
-          height={`${dimensions.height}` + `px`}
-        >
-          <ModalWrapper onClick={onMaskClick}>
-            <ModalContainer
-              onClick={e => {
-                // We are simply preventing the e based function up above from misfiring
-                e.stopPropagation()
-              }}
-              style={{ maxWidth: modalWidth }}
-            >
-              <ModalBody>{children}</ModalBody>
-            </ModalContainer>
-          </ModalWrapper>
-        </ModelMask>
-        </>
-      
-    ) : null
-  } catch (e) {
-    if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
-      console.log(e,React.version)
-    }
-    return (
-      
-      <ModelMask>
-        <ModalWrapper onClick={onMaskClick}>
-          <ModalContainer
-            onClick={e => {
-              // We are simply preventing the e based function up above from misfiring
-              e.stopPropagation()
-            }}
-          >
-            <ModalHeader>
-              <ModalHeaderCenterItem>Oops</ModalHeaderCenterItem>
-            </ModalHeader>
-            <ModalBody>Something went wrong here.</ModalBody>
-            <ModalHeader>
-              <ModalDefaultButton />
-              <ModalHeaderCenterButton>
-                <div onClick={onModalClose}>Okay</div>
-              </ModalHeaderCenterButton>
-
-              <ModalDefaultButton />
-            </ModalHeader>
-          </ModalContainer>
-        </ModalWrapper>
-      </ModelMask>
-    )
-  }
-}
+  
 
 // Styling for the Modal Components **********
 const fadeInEffect = keyframes`
@@ -192,4 +185,3 @@ const ModalBody = styled.div`
   z-index: 999 !important;
 `
 
-export default GenericModal
