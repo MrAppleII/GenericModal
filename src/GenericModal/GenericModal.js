@@ -1,6 +1,5 @@
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
-
 import PropTypes from "prop-types"
 import styled, { keyframes } from "styled-components"
 
@@ -10,8 +9,9 @@ class GenericModal extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      width: window.innerWidth,
-      height: window.innerHeight,
+      // We have to set this to undefined or else the SSR compile will yell at us. 
+      width: undefined,
+      height: undefined,
 
   }
 }
@@ -30,7 +30,10 @@ onMaskClick = e => {
 }
 componentDidMount() {
   window.addEventListener("resize", this.handleResize)
-
+  this.setState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  })
 
 }
 componentWillUnmount() {
@@ -41,10 +44,10 @@ componentWillUnmount() {
 
 render() {
   try {
-    return this.props.showModalStatus? ReactDOM.createPortal(
+    return this.props.isVisible? ReactDOM.createPortal(
       <ModelMask
-      width={`${this.state.width}` + `px`}
-      height={`${this.state.height}` + `px`}
+      width={this.state.width + `px`}
+      height={this.state.height + `px`}
     >
       <ModalWrapper onClick={this.onMaskClick}>
         <ModalContainer
@@ -96,14 +99,14 @@ render() {
 export default GenericModal
 
 GenericModal.propTypes = {
-  showModalStatus: PropTypes.bool,
+  isVisible: PropTypes.bool,
   onModalOpen: PropTypes.func,
   onModalClose: PropTypes.func,
   buttonText: PropTypes.string,
   modalWidth: PropTypes.string,
 }
 GenericModal.defaultProps = {
-  showModalStatus: false,
+  isVisible: false,
   buttonText: "Cancel",
   modalWidth: "350px",
   onModalOpen: function() {},
@@ -121,14 +124,9 @@ from {
 `
 const ModelMask = styled.div`
   position: fixed;
-  z-index: 999 !important;
+  z-index: 950 !important;
   top: 0;
   left: 0;
-
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
   width: ${props => props.width || "100vw"};
   height: ${props => props.height || "100vh"};
   background-color: rgba(0, 0, 0, 0.5);
